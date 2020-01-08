@@ -86,10 +86,10 @@ module.exports = {
     }
   },
 
-  handler (argv) {
+  async handler (argv) {
     const {
       path,
-      getIpfs,
+      ipfs,
       offset,
       length,
       create,
@@ -106,25 +106,21 @@ module.exports = {
       shardSplitThreshold
     } = argv
 
-    argv.resolve((async () => {
-      const ipfs = await getIpfs()
-
-      await ipfs.files.write(path, process.stdin, {
-        offset,
-        length,
-        create,
-        truncate,
-        rawLeaves,
-        reduceSingleLeafToSelf,
-        cidVersion,
-        hashAlg,
-        format,
-        parents,
-        progress,
-        strategy,
-        flush,
-        shardSplitThreshold
-      })
-    })())
+    await ipfs.api.files.write(path, process.stdin, {
+      offset,
+      length,
+      create,
+      truncate,
+      rawLeaves,
+      reduceSingleLeafToSelf,
+      cidVersion,
+      hashAlg,
+      format,
+      parents,
+      progress,
+      strategy,
+      flush,
+      shardSplitThreshold
+    })
   }
 }

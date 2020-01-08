@@ -14,12 +14,9 @@ module.exports = {
   handler (argv) {
     const {
       path,
-      getIpfs
+      ipfs
     } = argv
 
-    argv.resolve((async () => {
-      const ipfs = await getIpfs()
-      return ipfs.files.flush(path || FILE_SEPARATOR, {})
-    })())
+    return ipfs.api.files.flush(path || FILE_SEPARATOR, {})
   }
 }

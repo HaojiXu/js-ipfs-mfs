@@ -28,32 +28,28 @@ module.exports = {
   handler (argv) {
     const {
       path,
-      getIpfs,
+      ipfs,
       offset,
       length
     } = argv
 
-    argv.resolve((async () => {
-      const ipfs = await getIpfs()
+    return new Promise((resolve, reject) => {
+      pull(
+        ipfs.api.files.readPullStream(path, {
+          offset,
+          length
+        }),
+        through(buffer => {
+          print(buffer, false)
+        }),
+        onEnd((error) => {
+          if (error) {
+            return reject(error)
+          }
 
-      return new Promise((resolve, reject) => {
-        pull(
-          ipfs.files.readPullStream(path, {
-            offset,
-            length
-          }),
-          through(buffer => {
-            print(buffer, false)
-          }),
-          onEnd((error) => {
-            if (error) {
-              return reject(error)
-            }
-
-            resolve()
-          })
-        )
-      })
-    })())
+          resolve()
+        })
+      )
+    })
   }
 }

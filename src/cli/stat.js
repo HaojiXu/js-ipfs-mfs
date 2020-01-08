@@ -51,36 +51,32 @@ Type: <type>`,
   handler (argv) {
     const {
       path,
-      getIpfs,
+      ipfs,
       format,
       hash,
       size,
       withLocal
     } = argv
 
-    argv.resolve((async () => {
-      const ipfs = await getIpfs()
+    return ipfs.api.files.stat(path, {
+      withLocal
+    })
+      .then((stats) => {
+        if (hash) {
+          return print(stats.hash)
+        }
 
-      return ipfs.files.stat(path, {
-        withLocal
+        if (size) {
+          return print(stats.size)
+        }
+
+        print(format
+          .replace('<hash>', stats.hash)
+          .replace('<size>', stats.size)
+          .replace('<cumulsize>', stats.cumulativeSize)
+          .replace('<childs>', stats.blocks)
+          .replace('<type>', stats.type)
+        )
       })
-        .then((stats) => {
-          if (hash) {
-            return print(stats.hash)
-          }
-
-          if (size) {
-            return print(stats.size)
-          }
-
-          print(format
-            .replace('<hash>', stats.hash)
-            .replace('<size>', stats.size)
-            .replace('<cumulsize>', stats.cumulativeSize)
-            .replace('<childs>', stats.blocks)
-            .replace('<type>', stats.type)
-          )
-        })
-    })())
   }
 }
